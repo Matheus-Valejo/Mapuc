@@ -1,7 +1,7 @@
 import { layers, namedFlavor } from '@protomaps/basemaps';
 import * as maplibregl from 'maplibre-gl';
 import { LitElement, css, html, unsafeCSS } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { Protocol } from 'pmtiles';
 import mapLibreStyles from 'maplibre-gl/dist/maplibre-gl.css?inline';
 import mapLibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
@@ -43,12 +43,17 @@ export class PucMap extends LitElement {
 
 	private map?: maplibregl.Map;
 
+	@property({ attribute: 'archive-url' })
+	archiveUrl = '';
+
 	render() {
 		return html`<div id="map" aria-label="Map of PUC-Rio"></div>`;
 	}
 
 	firstUpdated() {
-		const archiveUrl = `${window.location.origin}${import.meta.env.BASE_URL}puc-rio.pmtiles`;
+		const archiveBaseUrl = new URL(import.meta.env.BASE_URL, window.location.origin);
+		const archiveUrl =
+			this.archiveUrl || new URL('puc-rio.pmtiles', archiveBaseUrl).toString();
 
 		this.map = new maplibregl.Map({
 			container: this.renderRoot.querySelector('#map') as HTMLElement,
