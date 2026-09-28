@@ -5,7 +5,7 @@ The map square scales to the viewport by default (up to 760 px). Set `--puc-map-
 ```html
 <puc-map style="--puc-map-size: 600px"></puc-map>
 ```
-The component and map files must be hosted, and in order to use them, the following imports must be made:
+In order to use the map, the following imports must be made:
 
 ```html
 <script
