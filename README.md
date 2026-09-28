@@ -7,7 +7,7 @@ The map square scales to the viewport by default (up to 760 px). Set `--puc-map-
 ```
 The component and map files must be hosted, and in order to use them, the following imports must be made:
 
-'''html
+```html
 <script
   type="module"
   src="https://mapas.mapuc.com/mapuc.js"
@@ -17,4 +17,4 @@ The component and map files must be hosted, and in order to use them, the follow
   archive-url="https://mapas.mapuc.com/puc-rio.pmtiles"
   style="--puc-map-size: 600px"
 ></puc-map>
-'''
+```
