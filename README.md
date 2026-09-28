@@ -11,11 +11,11 @@ In order to use the map, the following imports must be made:
 ```html
 <script
   type="module"
-  src="https://mapas.mapuc.com/mapuc.js"
+  src="https://pucmap.com/mapuc.js"
 ></script>
 
 <puc-map
-  archive-url="https://mapas.mapuc.com/puc-rio.pmtiles"
+  archive-url="https://pucmap.com/puc-rio.pmtiles"
   style="--puc-map-size: 600px"
 ></puc-map>
 ```
