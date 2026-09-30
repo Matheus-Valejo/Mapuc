@@ -5,6 +5,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { Protocol } from 'pmtiles';
 import mapLibreStyles from 'maplibre-gl/dist/maplibre-gl.css?inline';
 import mapLibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
+import pinSvg from './assets/pin.svg?raw';
 
 const pmtilesProtocol = new Protocol();
 maplibregl.setWorkerUrl(mapLibreWorkerUrl);
@@ -81,9 +82,17 @@ export class PucMap extends LitElement {
 				),
 			},
 		});
-
+		const markerElement = document.createElement('div');
+		markerElement.innerHTML = pinSvg;
+		new maplibregl.Marker({
+			element: markerElement,
+			anchor: 'bottom',
+		})
+		.setLngLat([-43.2335, -22.9795])
+		.addTo(this.map);
 		this.map.addControl(new maplibregl.NavigationControl(), 'top-right');
 	}
+
 
 	disconnectedCallback() {
 		super.disconnectedCallback();
