@@ -39,6 +39,11 @@ export class PucMap extends LitElement {
 			border-radius: 16px;
 			box-shadow: 0 16px 48px rgb(27 39 51 / 18%);
 		}
+		.pin svg{
+			stroke:#000000;
+			fill:#FF0000;
+			
+		}
 	`,
 	];
 
@@ -83,12 +88,16 @@ export class PucMap extends LitElement {
 			},
 		});
 		const markerElement = document.createElement('div');
+		markerElement.className = "pin";
 		markerElement.innerHTML = pinSvg;
+		
 		new maplibregl.Marker({
 			element: markerElement,
 			anchor: 'bottom',
+
 		})
 		.setLngLat([-43.2335, -22.9795])
+		
 		.addTo(this.map);
 		this.map.addControl(new maplibregl.NavigationControl(), 'top-right');
 	}
