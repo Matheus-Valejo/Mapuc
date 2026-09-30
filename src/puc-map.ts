@@ -5,6 +5,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { Protocol } from 'pmtiles';
 import mapLibreStyles from 'maplibre-gl/dist/maplibre-gl.css?inline';
 import mapLibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
+import pinSvg from './assets/pin.svg?raw';
 
 const pmtilesProtocol = new Protocol();
 maplibregl.setWorkerUrl(mapLibreWorkerUrl);
@@ -43,6 +44,10 @@ export class PucMap extends LitElement {
 			height: 100%;
 			border-radius: 16px;
 			box-shadow: 0 16px 48px rgb(27 39 51 / 18%);
+		}
+		.pin svg{
+			stroke:#000000;
+			fill:#FF0000;
 		}
 
 		.search {
@@ -196,9 +201,21 @@ export class PucMap extends LitElement {
 				),
 			},
 		});
+		const markerElement = document.createElement('div');
+		markerElement.className = "pin";
+		markerElement.innerHTML = pinSvg;
+		
+		new maplibregl.Marker({
+			element: markerElement,
+			anchor: 'bottom',
 
+		})
+		.setLngLat([-43.2335, -22.9795])
+		
+		.addTo(this.map);
 		this.map.addControl(new maplibregl.NavigationControl(), 'top-right');
 	}
+
 
 	disconnectedCallback() {
 		this.ownerDocument.removeEventListener('pointerdown', this.handleOutsidePointer, true);
