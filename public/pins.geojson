@@ -1,0 +1,374 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "tipo": "edifício",
+        "predio": "frings",
+        "nome": "Ala Frings",
+        "descricao": "Ala Frings",
+        "imagem": "https://www.cimentoitambe.com.br/investimento-em-pesquisa-destaca-curso-de-engenharia-civil-da-puc-rj/",
+        "nivel": 1
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.2321509,
+          -22.9789552
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tipo": "edifício",
+        "predio": "kennedy",
+        "nome": "Ala Kennedy",
+        "descricao": "Ala Kennedy",
+        "imagem": "https://www.puc-rio.br/ensinopesq/somospuc/",
+        "nivel": 1
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.2327422,
+          -22.9790819
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tipo": "edificio",
+        "predio": "leme",
+        "nome": "Edifício Cardeal Leme",
+        "descricao": "Edifício Cardeal Leme",
+        "imagem": "https://www.puc-rio.br/sobrepuc/campus/",
+        "nivel": 1
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.2324414,
+          -22.9797304
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tipo": "restaurante",
+        "predio": "kennedy",
+        "nome": "Bandeijão",
+        "descricao": "Restaurante Universitário",
+        "imagem": "https://puc-riodigital.com.puc-rio.br/cgi/cgilua.exe/sys/start.htm?infoid=9959&sid=13",
+        "nivel": 2,
+        "andar": "terreo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.2324175,
+          -22.9788191
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tipo": "edificio",
+        "predio": "rdc",
+        "nome": "Rio Data Centro",
+        "descricao": "RDC",
+        "imagem": "https://www.instagram.com/p/C5ZUR_BuGJ-/",
+        "nivel": 1
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.2335494,
+          -22.9808165
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tipo": "museu",
+        "predio": "Museu Universitário Solar Grandjean de Montigny",
+        "nome": "Museu Universitário Solar Grandjean de Montigny",
+        "descricao": "Museu Universitário Solar Grandjean de Montigny",
+        "imagem": "https://pt.wikipedia.org/wiki/Solar_Grandjean_de_Montigny",
+        "nivel": 1
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.2337116,
+          -22.9790057
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tipo": "edificio",
+        "predio": "nit",
+        "nome": "Núcleos de Inovação Tecnológica",
+        "descricao": "",
+        "imagem": "https://www.google.com/imgres?q=nit puc rio&imgurl=https%3A%2F%2Fwww.inf.puc-rio.br%2Fwordpress%2Fwp-content%2Fuploads%2F2017%2F01%2Flogo_btg-280x175.png&imgrefurl=https%3A%2F%2Fwww.inf.puc-rio.br%2Flaboratorios%2F&docid=SmNDPh1eAsYXxM&tbnid=b1saH4irujdG2M&vet=12ahUKEwiy6eDGpJaXAxXhErkGHan0AOoQnPAOegQITRAA..i&w=280&h=175&hcb=2&ved=2ahUKEwiy6eDGpJaXAxXhErkGHan0AOoQnPAOegQITRAA",
+        "nivel": 1
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.2339337,
+          -22.9810011
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tipo": "infraestrutura",
+        "predio": "leme",
+        "nome": "Programa Institucional de Permanência Estudantil",
+        "descricao": "Programa Institucional de Permanência Estudantil compreende as atividades continuadas destinadas a assegurar condições assistenciais comprometidas com a melhoria da vida acadêmica dos estudantes da PUC-Rio",
+        "imagem": "https://www.puc-rio.br/sobrepuc/admin/vrc/inclusao_social/cba/fesp/",
+        "nivel": 2,
+        "andar": "terreo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.2319245,
+          -22.9796177
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tipo": "infraestrutura",
+        "predio": "leme",
+        "nome": "Programa de Pós-Graduação em Metrologia da PUC-Rio",
+        "descricao": "Programa de Pós-graduação em Metrologia (PósMQI) da PUC-Rio tem o objetivo de a formação e a capacitação de recursos humanos especializados em metrologia e suas áreas correlatas para suprir necessidades do Sistema Nacional de Metrologia, Normalização e Qualidade Industrial (Sinmetro).",
+        "imagem": "https://www.youtube.com/channel/UCK8mf0IasMh34KYHFL_pnGA",
+        "nivel": 2,
+        "andar": "terreo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.2319474,
+          -22.9795544
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tipo": "infraestrutura",
+        "predio": "nit",
+        "nome": "Laboratório de Graduação (LAB-GRAD)",
+        "descricao": "A missão do laboratório é disponibilizar a infraestrutura necessária para o desenvolvimento acadêmico adequado dos alunos de graduação, viabilizando o estudo, a pesquisa e a realização de todos os trabalhos previstos ao longo do curso.",
+        "imagem": "https://informatica.ufes.br/pt-br/laboratorio-de-graduacao-labgrad",
+        "nivel": 2,
+        "andar": "terreo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.2338525,
+          -22.9809479
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tipo": "infraestrutura",
+        "predio": "leme",
+        "nome": "RioBotz",
+        "descricao": "Nós projetamos, otimizamos e construímos estruturas mecânicas, sistemas de locomoção e atuadores.",
+        "imagem": "https://www.tupi.fm/sentinelas/robos-da-riobotz-puc-rio-vao-brilhar-na-rio2c-neste-domingo/",
+        "nivel": 2,
+        "andar": "terreo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.2325509,
+          -22.9798441
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tipo": "infraestrutura",
+        "predio": "leme",
+        "nome": "Departamento de Filosofia da PUC-Rio",
+        "descricao": "O Departamento de Filosofia da PUC-Rio visa a formação de pesquisadores e professores de Filosofia, tanto em seu curso de Graduação (Bacharelado e Licenciatura) como no de Pós-Graduação (Mestrado e Doutorado). ",
+        "imagem": "http://www.fil.puc-rio.br/",
+        "nivel": 2,
+        "andar": 11
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.2323493,
+          -22.9796458
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tipo": "infraestrutura",
+        "predio": "frings",
+        "nome": "Biblioteca Central",
+        "descricao": "A Biblioteca Central (BC), localizada no Ed. da Amizade, Ala Frings, 3º andar, reúne acervo do Sistema de Bibliotecas, que compreende livros, teses e dissertações, periódicos, documentos especiais, entre outros materiais.",
+        "imagem": "https://www.instagram.com/p/DLA_L5Bpvw4/",
+        "nivel": 2,
+        "andar": 3
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.2322494,
+          -22.9788056
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tipo": "edificio",
+        "predio": "ginasio",
+        "nome": "Espaço Cultural e Esportivo Pe. Ormindo Viveiros de Castro (Ginásio)",
+        "descricao": "No Espaço Cultural e Esportivo Pe. Ormindo Viveiros de Castro, são realizadas as aulas de educação física e treinamento das equipes representativas, treinamento das equipes das Atléticas dos cursos, atividades culturais, encontros culturais e sociais promovidos por departamentos e unidades, pela Coordenação de Atividades Comunitárias e Culturais assim como pelo Diretório Central dos Estudantes. Também, na forma de cessão, atende as Escolas do entorno para atividades culturais e formaturas de final de ano.",
+        "imagem": "https://www.puc-rio.br/sobrepuc/admin/vrc/campus/espacos/imagens/img_vrc_campus_ginasio.png",
+        "nivel": 1
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.2320234,
+          -22.9776577
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tipo": "edificio",
+        "predio": "LABSEM",
+        "nome": "Laboratório de Semicondutores (LabSem)",
+        "descricao": "Integrado ao Grupo de Optoeletrônica do Centro de Estudos em Telecomunicações (CETUC) do Departamento de Engenharia Elétrica (DEE) da PUC-Rio, o Laboratório de Semicondutores (LabSem) conta com equipamentos de última geração, capazes de fornecer amostras de qualidade comparável aos mais altos padrões internacionais.  No LabSem são realizadas pesquisas básica e aplicada na área de materiais semicondutores III-V para dispositivos eletrônicos e optoeletrônicos utilizados em telecomunicações.",
+        "imagem": "https://www.facebook.com/LabSem/",
+        "nivel": 1
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.2342765,
+          -22.9813415
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tipo": "restaurante",
+        "predio": "nenhum",
+        "nome": "Couve-Flor",
+        "descricao": "Restaurante estilizado de especialidades variadas em buffet de opções seletas inclinadas à cozinha francesa.",
+        "imagem": "https://lh3.googleusercontent.com/gps-cs-s/ANWiy9TOGzbsm0tPegTEycUDzuNxy3UsZ2tSu4iucvrWTGSWmRtyHah_h9md_wLqzNqFc1OVJTi5Nu6daQjY30URhv-QekDFql3ScEHIGQHfxrWQ92lpfpy3--Lv-MdKKw917QCg8rpP=s680-w680-h510-rw",
+        "nivel": 1
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.2341067,
+          -22.980222
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tipo": "infraestrutura",
+        "predio": "leme",
+        "nome": "Centro Técnico Científico",
+        "descricao": "Infraestrutura de alto nível e as pesquisas de padrão internacional realizadas no CTC, incentivando a interação com diferentes setores da indústria, via projetos de P&D ou serviços especializados..",
+        "imagem": "https://www.google.com/imgres?q=ctc puc rio&imgurl=https%3A%2F%2Fwww.ctc.puc-rio.br%2FUpload%2FImagem%2F2018%2F05%2FCTC-para-o-site.jpg&imgrefurl=https%3A%2F%2Fwww.ctc.puc-rio.br%2Foito-cursos-do-ctcpuc-rio-abrem-as-inscricoes-para-pos-graduacao&docid=jcZ3gIOFCkVyhM&tbnid=U05WzrROqo8aQM&vet=12ahUKEwjRz6KcuJaXAxXBq5UCHYM8A_UQnPAOegQIUBAA..i&w=800&h=520&hcb=2&ved=2ahUKEwjRz6KcuJaXAxXBq5UCHYM8A_UQnPAOegQIUBAA",
+        "nivel": 2,
+        "andar": 2
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.2329092,
+          -22.9799541
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tipo": "edificio",
+        "predio": "NRCP",
+        "nome": "Núcleo Regional de Competência em Petróleo (NRCP)",
+        "descricao": "é um centro de excelência em pesquisa, desenvolvimento e inovação voltado para a indústria de óleo, gás e energia",
+        "imagem": "https://www.hmaarquitetura.com/puc-rj-nrcp",
+        "nivel": 1
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.2315876,
+          -22.9778886
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tipo": "restaurante",
+        "predio": "leme",
+        "nome": "Megamatte Puc-Rio",
+        "descricao": "Rede de lanchonetes serve variações de erva mate orgânica, sucos, cafés, salgados e doces, em clima informal.",
+        "imagem": "https://www.google.com/imgres?q=megamatte&imgurl=https%3A%2F%2Fdynamic-media-cdn.tripadvisor.com%2Fmedia%2Fphoto-o%2F17%2F9a%2Fb0%2Fed%2Ffrente-de-loja.jpg%3Fw%3D500%26h%3D-1%26s%3D1&imgrefurl=https%3A%2F%2Fwww.tripadvisor.com.br%2FRestaurant_Review-g303506-d6867903-Reviews-Megamatte_Centro_Empresarial_Barra_Shopping-Rio_de_Janeiro_State_of_Rio_de_Janeir.html&docid=CuWmuyxkwZ5ApM&tbnid=rCddHgnH-ZoAZM&vet=12ahUKEwiAmaHn8KKXAxXppZUCHZiNIdgQnPAOegQINxAA..i&w=500&h=334&hcb=2&ved=2ahUKEwiAmaHn8KKXAxXppZUCHZiNIdgQnPAOegQINxAA",
+        "nivel": 2,
+        "andar": "terreo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.2330476,
+          -22.9800554
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tipo": "edificio",
+        "predio": "nenhum",
+        "nome": "Pastoral Universitária Anchieta",
+        "descricao": "A Pastoral Universitária é o serviço à comunidade acadêmica oferecido desde a experiência cristã católica, sob o entusiasmo da fé, do Evangelho e dos valores do Reino de Deus.",
+        "imagem": "https://cargocollective.com/joaotavares/Logo-Pastoral-Universitaria-Anchieta",
+        "nivel": 1
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.2337414,
+          -22.9794601
+        ]
+      }
+    }
+  ]
+}
