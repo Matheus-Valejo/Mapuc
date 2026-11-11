@@ -176,7 +176,12 @@ export class PucMap extends LitElement {
 			const el = document.createElement('div');
 			el.className = 'pin';
 			el.title = nome ?? '';
-			el.innerHTML = pinSvg;
+			el.innerHTML = el.innerHTML = `
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+        ${pinSvg}
+        <span>${nome}</span>
+    	</div>
+	`;
 
 			const content = document.createElement('div');
 			const title = document.createElement('strong');
