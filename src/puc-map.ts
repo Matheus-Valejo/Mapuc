@@ -101,6 +101,40 @@ export class PucMap extends LitElement {
 		.search.open .search-input { opacity: 1; visibility: visible; }
 		.search-input::placeholder { color: #687787; }
 
+		.maplibregl-ctrl-group:has(.maplibregl-ctrl-geolocate) {
+			border-radius: 50%;
+			box-shadow: 0 3px 14px rgb(27 39 51 / 18%);
+		}
+
+		.maplibregl-ctrl-group button.maplibregl-ctrl-geolocate {
+			width: 44px;
+			height: 44px;
+			border-radius: 50%;
+		}
+
+		.maplibregl-ctrl-geolocate:focus-visible {
+			outline: 2px solid #507c9b;
+			outline-offset: 3px;
+		}
+
+		.location-status {
+			position: absolute;
+			left: 12px;
+			right: 12px;
+			bottom: 36px;
+			z-index: 2;
+			margin: 0;
+			padding: 10px 12px;
+			border-radius: 12px;
+			background: white;
+			color: #243447;
+			box-shadow: 0 3px 14px rgb(27 39 51 / 18%);
+			font: 14px/1.4 system-ui, sans-serif;
+			pointer-events: none;
+		}
+
+		.location-status:empty { display: none; }
+
 		@media (prefers-reduced-motion: reduce) {
 			.search, .search-input { transition: none; }
 		}
@@ -111,6 +145,9 @@ export class PucMap extends LitElement {
 
 	@state()
 	private searchOpen = false;
+
+	@state()
+	private locationStatus = '';
 
 	connectedCallback() {
 		super.connectedCallback();
@@ -161,6 +198,7 @@ export class PucMap extends LitElement {
 						placeholder="Pesquisar no mapa" aria-label="Pesquisar no mapa"
 						?disabled=${!this.searchOpen} />
 				</div>
+				<p class="location-status" role="status" aria-live="polite" aria-atomic="true">${this.locationStatus}</p>
 			</div>
 		`;
 	}
@@ -177,6 +215,10 @@ export class PucMap extends LitElement {
 			minZoom: 16,
 			maxZoom: 20,
 			maxBounds: MAP_BOUNDS,
+			locale: {
+				'GeolocateControl.FindMyLocation': 'Mostrar minha localização',
+				'GeolocateControl.LocationNotAvailable': 'Localização indisponível: verifique a permissão do navegador',
+			},
 			style: {
 				version: 8,
 				glyphs: 'https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf',
@@ -198,6 +240,41 @@ export class PucMap extends LitElement {
 		});
 
 		this.map.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+		// The browser is asked for permission only when the user activates this control.
+		const geolocate = new maplibregl.GeolocateControl({
+			positionOptions: { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 },
+			trackUserLocation: true,
+			showUserLocation: true,
+			showAccuracyCircle: true,
+			fitBoundsOptions: { maxZoom: 18, duration: 600 },
+		});
+		geolocate.on('trackuserlocationstart', () => {
+			this.locationStatus = 'Buscando sua localização… Autorize o acesso no navegador.';
+		});
+		geolocate.on('geolocate', () => {
+			this.locationStatus = '';
+		});
+		geolocate.on('outofmaxbounds', () => {
+			this.locationStatus = 'Sua localização está fora da área deste mapa da PUC-Rio.';
+		});
+		geolocate.on('error', (event) => {
+			this.locationStatus = event.code === 1
+				? 'Acesso à localização negado. Permita o acesso nas configurações do site e recarregue a página.'
+				: event.code === 3
+					? 'A localização está demorando. Verifique o GPS e a conexão; continuaremos tentando.'
+					: 'Não foi possível obter sua localização. Verifique se a localização do dispositivo está ativada.';
+		});
+		geolocate.on('trackuserlocationend', () => {
+			this.locationStatus = '';
+		});
+		geolocate.on('userlocationfocus', () => {
+			this.locationStatus = '';
+		});
+		this.map.addControl(geolocate, 'top-right');
+		if (!window.isSecureContext || !navigator.geolocation) {
+			this.locationStatus = 'Localização indisponível. Abra o mapa em HTTPS e use um navegador com suporte à localização.';
+		}
 	}
 
 	disconnectedCallback() {
