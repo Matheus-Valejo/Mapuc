@@ -5,6 +5,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { Protocol } from 'pmtiles';
 import mapLibreStyles from 'maplibre-gl/dist/maplibre-gl.css?inline';
 import mapLibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
+import pinSvg from './assets/pin.svg?raw';
 
 const pmtilesProtocol = new Protocol();
 maplibregl.setWorkerUrl(mapLibreWorkerUrl);
@@ -14,6 +15,15 @@ const MAP_BOUNDS: maplibregl.LngLatBoundsLike = [
 	[-43.235798, -22.982222],
 	[-43.231003, -22.9773],
 ];
+
+type PinProps = {
+	tipo: string;
+	predio: string;
+	nome: string;
+	descricao: string;
+	imagem?: string;
+	nivel?: number;
+};
 
 @customElement('puc-map')
 export class PucMap extends LitElement {
@@ -43,6 +53,12 @@ export class PucMap extends LitElement {
 			height: 100%;
 			border-radius: 16px;
 			box-shadow: 0 16px 48px rgb(27 39 51 / 18%);
+		}
+		.pin { line-height: 0; cursor: pointer; }
+		.pin svg {
+			display: block;
+			stroke: #000000;
+			fill: #FF0000;
 		}
 
 		.search {
@@ -179,6 +195,50 @@ export class PucMap extends LitElement {
 	@property({ attribute: 'archive-url' })
 	archiveUrl = '';
 
+	@property({ attribute: 'pins-url' })
+	pinsUrl = '';
+
+	private markers: maplibregl.Marker[] = [];
+
+	private async loadPins(url: string) {
+		const res = await fetch(url);
+		if (!res.ok) throw new Error(`pins: ${res.status} ${url}`);
+		const data = (await res.json()) as GeoJSON.FeatureCollection<GeoJSON.Point, PinProps>;
+
+		for (const feature of data.features) {
+			if (feature.geometry?.type !== 'Point' || !this.map) continue;
+			const [lng, lat] = feature.geometry.coordinates;
+			const { nome, descricao } = feature.properties ?? ({} as PinProps);
+
+			const el = document.createElement('div');
+			el.className = 'pin';
+			el.title = nome ?? '';
+			el.innerHTML = el.innerHTML = `
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+        ${pinSvg}
+        <span>${nome}</span>
+    	</div>
+	`;
+
+			const content = document.createElement('div');
+			const title = document.createElement('strong');
+			title.textContent = nome ?? '';
+			content.append(title);
+			if (descricao && descricao !== nome) {
+				const desc = document.createElement('p');
+				desc.textContent = descricao;
+				content.append(desc);
+			}
+
+			this.markers.push(
+				new maplibregl.Marker({ element: el, anchor: 'bottom', offset: [0, 1] })
+					.setLngLat([lng, lat])
+					.setPopup(new maplibregl.Popup({ offset: 26, closeButton: false }).setDOMContent(content))
+					.addTo(this.map),
+			);
+		}
+	}
+
 	render() {
 		return html`
 			<div class="map-frame">
@@ -239,6 +299,8 @@ export class PucMap extends LitElement {
 			},
 		});
 
+		const pinsUrl = this.pinsUrl || new URL('pins.geojson', archiveBaseUrl).toString();
+		this.loadPins(pinsUrl).catch((err) => console.error(err));
 		this.map.addControl(new maplibregl.NavigationControl(), 'top-right');
 
 		// The browser is asked for permission only when the user activates this control.
@@ -277,9 +339,12 @@ export class PucMap extends LitElement {
 		}
 	}
 
+
 	disconnectedCallback() {
 		this.ownerDocument.removeEventListener('pointerdown', this.handleOutsidePointer, true);
 		super.disconnectedCallback();
+		this.markers.forEach((m) => m.remove());
+		this.markers = [];
 		this.map?.remove();
 		this.map = undefined;
 	}
