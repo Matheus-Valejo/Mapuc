@@ -117,6 +117,33 @@ export class PucMap extends LitElement {
 		.search.open .search-input { opacity: 1; visibility: visible; }
 		.search-input::placeholder { color: #687787; }
 
+		.search-results {
+			position: absolute;
+			top: 72px;
+			left: 16px;
+			z-index: 2;
+			box-sizing: border-box;
+			width: 320px;
+			max-width: calc(100% - 72px);
+			margin: 0;
+			padding: 8px 0;
+			list-style: none;
+			border-radius: 20px;
+			background: white;
+			color: #243447;
+			box-shadow: 0 3px 14px rgb(27 39 51 / 18%);
+			font: 15px/1.4 system-ui, sans-serif;
+		}
+
+		.search-results li {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			padding: 12px 16px;
+		}
+
+		.search-results svg { width: 24px; height: 24px; flex-shrink: 0; }
+
 		.maplibregl-ctrl-group:has(.maplibregl-ctrl-geolocate) {
 			border-radius: 50%;
 			box-shadow: 0 3px 14px rgb(27 39 51 / 18%);
@@ -163,6 +190,9 @@ export class PucMap extends LitElement {
 	private searchOpen = false;
 
 	@state()
+	private searchQuery = '';
+
+	@state()
 	private locationStatus = '';
 
 	connectedCallback() {
@@ -172,12 +202,15 @@ export class PucMap extends LitElement {
 
 	private handleOutsidePointer = (event: PointerEvent) => {
 		const search = this.renderRoot.querySelector('.search');
-		if (this.searchOpen && search && !event.composedPath().includes(search)) {
+		const results = this.renderRoot.querySelector('.search-results');
+		const path = event.composedPath();
+		if (this.searchOpen && search && !path.includes(search) && (!results || !path.includes(results))) {
 			this.searchOpen = false;
 		}
 	};
 
 	private async openSearch() {
+		if (!this.searchOpen) this.searchQuery = '';
 		this.searchOpen = true;
 		await this.updateComplete;
 		this.renderRoot.querySelector<HTMLInputElement>('.search-input')?.focus();
@@ -240,6 +273,9 @@ export class PucMap extends LitElement {
 	}
 
 	render() {
+		const names = this.searchQuery.length > 0
+			? ['Cardeal Leme']
+			: ['Cardeal Leme', 'Entrada do Cardeal Leme', 'Salas do Cardeal Leme'];
 		return html`
 			<div class="map-frame">
 				<div id="map" aria-label="Map of PUC-Rio"></div>
@@ -256,8 +292,24 @@ export class PucMap extends LitElement {
 					</button>
 					<input id="map-search" class="search-input" type="search"
 						placeholder="Pesquisar no mapa" aria-label="Pesquisar no mapa"
+						.value=${this.searchQuery}
+						@input=${(event: Event) => { this.searchQuery = (event.target as HTMLInputElement).value; }}
 						?disabled=${!this.searchOpen} />
 				</div>
+				${this.searchOpen ? html`
+					<ul class="search-results" aria-label="Sugestões de lugares" aria-live="polite">
+						${names.map(name => html`
+							<li>
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+									stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+									<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"></path>
+									<circle cx="12" cy="10" r="3"></circle>
+								</svg>
+								<span>${name}</span>
+							</li>
+						`)}
+					</ul>
+				` : ''}
 				<p class="location-status" role="status" aria-live="polite" aria-atomic="true">${this.locationStatus}</p>
 			</div>
 		`;
