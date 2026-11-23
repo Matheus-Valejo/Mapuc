@@ -199,7 +199,17 @@ export class PucMap extends LitElement {
 	@property({ attribute: 'pins-url' })
 	pinsUrl = '';
 
-	private markers: maplibregl.Marker[] = [];
+	private markers: { marker: maplibregl.Marker; nivel: number }[] = [];
+
+	private static NIVEL_MIN_ZOOM: Record<number, number> = { 1: 0, 2: 17.5 };
+
+	private updatePinVisibility = () => {
+		const zoom = this.map?.getZoom() ?? 0;
+		for (const { marker, nivel } of this.markers) {
+			const minZoom = PucMap.NIVEL_MIN_ZOOM[nivel] ?? 0;
+			marker.getElement().style.display = zoom >= minZoom ? '' : 'none';
+		}
+	};
 
 	private fuse?: Fuse<GeoJSON.Feature<GeoJSON.Point, PinProps>>;
 
@@ -228,7 +238,7 @@ export class PucMap extends LitElement {
 		for (const feature of data.features) {
 			if (feature.geometry?.type !== 'Point' || !this.map) continue;
 			const [lng, lat] = feature.geometry.coordinates;
-			const { nome, descricao } = feature.properties ?? ({} as PinProps);
+			const { nome, descricao, nivel = 1 } = feature.properties ?? ({} as PinProps);
 
 			const el = document.createElement('div');
 			el.className = 'pin';
@@ -250,13 +260,17 @@ export class PucMap extends LitElement {
 				content.append(desc);
 			}
 
-			this.markers.push(
-				new maplibregl.Marker({ element: el, anchor: 'bottom', offset: [0, 1] })
+			this.markers.push({
+				nivel,
+				marker: new maplibregl.Marker({ element: el, anchor: 'bottom', offset: [0, 1] })
 					.setLngLat([lng, lat])
 					.setPopup(new maplibregl.Popup({ offset: 26, closeButton: false }).setDOMContent(content))
 					.addTo(this.map),
-			);
+			});
 		}
+
+		this.map?.on('zoom', this.updatePinVisibility);
+		this.updatePinVisibility();
 	}
 
 	render() {
@@ -363,7 +377,7 @@ export class PucMap extends LitElement {
 	disconnectedCallback() {
 		this.ownerDocument.removeEventListener('pointerdown', this.handleOutsidePointer, true);
 		super.disconnectedCallback();
-		this.markers.forEach((m) => m.remove());
+		this.markers.forEach((m) => m.marker.remove());
 		this.markers = [];
 		this.map?.remove();
 		this.map = undefined;
