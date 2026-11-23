@@ -3,6 +3,7 @@ import * as maplibregl from 'maplibre-gl';
 import { LitElement, css, html, unsafeCSS } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Protocol } from 'pmtiles';
+import Fuse from 'fuse.js';
 import mapLibreStyles from 'maplibre-gl/dist/maplibre-gl.css?inline';
 import mapLibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import pinSvg from './assets/pin.svg?raw';
@@ -200,10 +201,29 @@ export class PucMap extends LitElement {
 
 	private markers: maplibregl.Marker[] = [];
 
+	private fuse?: Fuse<GeoJSON.Feature<GeoJSON.Point, PinProps>>;
+
+	searchPins(query: string, limit = 10) {
+		if (!this.fuse || !query.trim()) return [];
+		return this.fuse.search(query, { limit }).map((r) => r.item);
+	}
+
 	private async loadPins(url: string) {
 		const res = await fetch(url);
 		if (!res.ok) throw new Error(`pins: ${res.status} ${url}`);
 		const data = (await res.json()) as GeoJSON.FeatureCollection<GeoJSON.Point, PinProps>;
+
+		this.fuse = new Fuse(data.features, {
+			keys: [
+				{ name: 'properties.nome', weight: 3 },
+				{ name: 'properties.predio', weight: 2 },
+				{ name: 'properties.tipo', weight: 1 },
+				{ name: 'properties.descricao', weight: 1 },
+			],
+			threshold: 0.35,
+			ignoreDiacritics: true,
+			ignoreLocation: true,
+		});
 
 		for (const feature of data.features) {
 			if (feature.geometry?.type !== 'Point' || !this.map) continue;
