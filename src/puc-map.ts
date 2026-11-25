@@ -24,6 +24,8 @@ type PinProps = {
 	descricao: string;
 	imagem?: string;
 	nivel?: number;
+	andar?: number;
+	sala?: number;
 };
 
 @customElement('puc-map')
@@ -179,6 +181,67 @@ export class PucMap extends LitElement {
 
 		.location-status:empty { display: none; }
 
+		.sidebar {
+			position: absolute;
+			top: 70px;
+			left: 0;
+			width: min(350px, 85%);
+			max-height: 100%
+			box-sizing: border-box;
+			padding: 20px;
+			margin: 10px;
+			background: white;
+			color: #243447;
+			box-shadow: 2px 0 12px rgb(27 39 51 / 18%);
+			z-index: 3;
+			transform: translateX(-110%);
+			visibility: hidden;
+			transition: transform 300ms ease, visibility 300ms;
+			font-family: system-ui, sans-serif;
+		}
+
+		.sidebar.open {
+			transform: translateX(0);
+			visibility: visible;
+		}
+		
+
+		.sidebar-close {
+			float: right;
+			border: 0;
+			background: transparent;
+			font-size: 20px;
+			cursor: pointer;
+		}
+		.sidebar-image {
+			display: block;
+			width: 100%;
+			height: 200px;
+			object-fit: cover;
+			border-radius: 10px;
+			margin-bottom: 15px;
+		}
+		.sidebar-row {
+			display: flex;
+			flex-direction: row;
+			gap: 20px;
+			margin-bottom: 15px;
+		}
+
+		.sidebar-info {
+			flex: 1;
+		}
+
+		.sidebar-label {
+			color: #888888;
+			font-weight: 300;
+			font-size: 14px;
+		}
+		.sidebar-label {
+		color: #888888;
+		font-weight: 300;
+		font-size: 14px;
+	}
 		@media (prefers-reduced-motion: reduce) {
 			.search, .search-input { transition: none; }
 		}
@@ -195,6 +258,12 @@ export class PucMap extends LitElement {
 
 	@state()
 	private locationStatus = '';
+
+	@state()
+	private sidebarOpen = false;
+
+	@state()
+	private selectedPin: PinProps | null = null;
 
 	connectedCallback() {
 		super.connectedCallback();
@@ -271,7 +340,7 @@ export class PucMap extends LitElement {
 		for (const feature of data.features) {
 			if (feature.geometry?.type !== 'Point' || !this.map) continue;
 			const [lng, lat] = feature.geometry.coordinates;
-			const { nome, descricao, nivel = 1 } = feature.properties ?? ({} as PinProps);
+			const { nome, nivel = 1 } = feature.properties ?? ({} as PinProps);
 
 			const el = document.createElement('div');
 			el.className = 'pin';
@@ -283,21 +352,16 @@ export class PucMap extends LitElement {
     	</div>
 	`;
 
-			const content = document.createElement('div');
-			const title = document.createElement('strong');
-			title.textContent = nome ?? '';
-			content.append(title);
-			if (descricao && descricao !== nome) {
-				const desc = document.createElement('p');
-				desc.textContent = descricao;
-				content.append(desc);
-			}
+			// Abre o painel lateral ao clicar no marcador.
+			el.addEventListener('click', () => {
+				this.selectedPin = feature.properties;
+				this.sidebarOpen = true;
+			});
 
 			this.markers.push({
 				nivel,
 				marker: new maplibregl.Marker({ element: el, anchor: 'bottom', offset: [0, 1] })
 					.setLngLat([lng, lat])
-					.setPopup(new maplibregl.Popup({ offset: 26, closeButton: false }).setDOMContent(content))
 					.addTo(this.map),
 			});
 		}
@@ -305,6 +369,78 @@ export class PucMap extends LitElement {
 		this.map?.on('zoom', this.updatePinVisibility);
 		this.updatePinVisibility();
 	}
+
+	private renderSidebar() {
+    return html`
+        <aside
+            class="sidebar ${this.sidebarOpen ? 'open' : ''}"
+            aria-hidden=${!this.sidebarOpen}
+        >
+            <button
+                class="sidebar-close"
+                type="button"
+                aria-label="Fechar painel"
+                @click=${() => {
+                    this.sidebarOpen = false;
+                }}
+            >×</button>
+			
+			
+            ${this.selectedPin ? html`
+			${this.selectedPin.imagem ? html`
+                    <img
+                        class="sidebar-image"
+                        src=${this.selectedPin.imagem}
+                      
+                    />
+                ` : ''}
+				
+                <h2>
+                    ${this.selectedPin.nome}
+				</h2>
+
+                <p class="sidebar-descricao">
+				<span class="sidebar-label">Descrição:</span>
+				<br>
+                    ${this.selectedPin.descricao}
+                </p>
+
+                <p class="sidebar-predio">
+                    <span class="sidebar-label">Prédio:</span>
+					<br>
+                    ${this.selectedPin.predio}
+                </p>
+
+                <p class="sidebar-tipo">
+                    <span class="sidebar-label">Tipo:</span>
+					<br>
+                    ${this.selectedPin.tipo}
+                </p>
+
+                <div class="sidebar-row">
+
+				<div class="sidebar-info">
+					<span class="sidebar-label">Andar</span>
+					<br>
+					${this.selectedPin.andar ?? 'Não informado'}
+				</div>
+
+				<div class="sidebar-info">
+					<span class="sidebar-label">Sala</span>
+					<br>
+					${this.selectedPin.nivel ?? 'Não informado'}
+				</div>
+
+			</div>
+                
+
+            ` : html`
+                <h2>Informações do prédio</h2>
+				
+            `}
+        </aside>
+    `;
+}
 
 	render() {
 		const names = this.searchQuery.length > 0
@@ -345,6 +481,7 @@ export class PucMap extends LitElement {
 					</ul>
 				` : ''}
 				<p class="location-status" role="status" aria-live="polite" aria-atomic="true">${this.locationStatus}</p>
+				${this.renderSidebar()}
 			</div>
 		`;
 	}
