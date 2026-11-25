@@ -3,7 +3,6 @@ import * as maplibregl from 'maplibre-gl';
 import { LitElement, css, html, unsafeCSS } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Protocol } from 'pmtiles';
-import Fuse from 'fuse.js';
 import mapLibreStyles from 'maplibre-gl/dist/maplibre-gl.css?inline';
 import mapLibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import pinSvg from './assets/pin.svg?raw';
@@ -18,12 +17,14 @@ const MAP_BOUNDS: maplibregl.LngLatBoundsLike = [
 ];
 
 type PinProps = {
-	tipo: string;
-	predio: string;
-	nome: string;
-	descricao: string;
-	imagem?: string;
-	nivel?: number;
+    tipo: string;
+    predio: string;
+    nome: string;
+    descricao: string;
+    imagem?: string;
+    nivel?: number;
+	andar?: number;
+	sala?: number;
 };
 
 @customElement('puc-map')
@@ -118,33 +119,6 @@ export class PucMap extends LitElement {
 		.search.open .search-input { opacity: 1; visibility: visible; }
 		.search-input::placeholder { color: #687787; }
 
-		.search-results {
-			position: absolute;
-			top: 72px;
-			left: 16px;
-			z-index: 2;
-			box-sizing: border-box;
-			width: 320px;
-			max-width: calc(100% - 72px);
-			margin: 0;
-			padding: 8px 0;
-			list-style: none;
-			border-radius: 20px;
-			background: white;
-			color: #243447;
-			box-shadow: 0 3px 14px rgb(27 39 51 / 18%);
-			font: 15px/1.4 system-ui, sans-serif;
-		}
-
-		.search-results li {
-			display: flex;
-			align-items: center;
-			gap: 12px;
-			padding: 12px 16px;
-		}
-
-		.search-results svg { width: 24px; height: 24px; flex-shrink: 0; }
-
 		.maplibregl-ctrl-group:has(.maplibregl-ctrl-geolocate) {
 			border-radius: 50%;
 			box-shadow: 0 3px 14px rgb(27 39 51 / 18%);
@@ -179,11 +153,75 @@ export class PucMap extends LitElement {
 
 		.location-status:empty { display: none; }
 
+		.sidebar {
+			position: absolute;
+			top: 70px;
+			left: 0;
+			width: min(350px, 85%);
+			max-height: 100%
+			box-sizing: border-box;
+			padding: 20px;
+			margin: 10px;
+			background: white;
+			color: #243447;
+			box-shadow: 2px 0 12px rgb(27 39 51 / 18%);
+			z-index: 3;
+			transform: translateX(-110%);
+			visibility: hidden;
+			transition: transform 300ms ease, visibility 300ms;
+			font-family: system-ui, sans-serif;
+		}
+
+		.sidebar.open {
+			transform: translateX(0);
+			visibility: visible;
+		}
+		
+
+		.sidebar-close {
+			float: right;
+			border: 0;
+			background: transparent;
+			font-size: 20px;
+			cursor: pointer;
+		}
+		.sidebar-image {
+			display: block;
+			width: 100%;
+			height: 200px;
+			object-fit: cover;
+			border-radius: 10px;
+			margin-bottom: 15px;
+		}
+		.sidebar-row {
+			display: flex;
+			flex-direction: row;
+			gap: 20px;
+			margin-bottom: 15px;
+		}
+
+		.sidebar-info {
+			flex: 1;
+		}
+
+		.sidebar-label {
+			color: #888888;
+			font-weight: 300;
+			font-size: 14px;
+		}
+		.sidebar-label {
+		color: #888888;
+		font-weight: 300;
+		font-size: 14px;
+	}
 		@media (prefers-reduced-motion: reduce) {
 			.search, .search-input { transition: none; }
 		}
-	`,
+				
+	`
+	
 	];
+
 
 	private map?: maplibregl.Map;
 
@@ -191,11 +229,12 @@ export class PucMap extends LitElement {
 	private searchOpen = false;
 
 	@state()
-	private searchQuery = '';
-
-	@state()
 	private locationStatus = '';
-
+	
+	@state()
+	private sidebarOpen = false;
+	@state()
+			private selectedPin: PinProps | null = null;
 	connectedCallback() {
 		super.connectedCallback();
 		this.ownerDocument.addEventListener('pointerdown', this.handleOutsidePointer, true);
@@ -203,15 +242,12 @@ export class PucMap extends LitElement {
 
 	private handleOutsidePointer = (event: PointerEvent) => {
 		const search = this.renderRoot.querySelector('.search');
-		const results = this.renderRoot.querySelector('.search-results');
-		const path = event.composedPath();
-		if (this.searchOpen && search && !path.includes(search) && (!results || !path.includes(results))) {
+		if (this.searchOpen && search && !event.composedPath().includes(search)) {
 			this.searchOpen = false;
 		}
 	};
 
 	private async openSearch() {
-		if (!this.searchOpen) this.searchQuery = '';
 		this.searchOpen = true;
 		await this.updateComplete;
 		this.renderRoot.querySelector<HTMLInputElement>('.search-input')?.focus();
@@ -232,46 +268,17 @@ export class PucMap extends LitElement {
 	@property({ attribute: 'pins-url' })
 	pinsUrl = '';
 
-	private markers: { marker: maplibregl.Marker; nivel: number }[] = [];
-
-	private static NIVEL_MIN_ZOOM: Record<number, number> = { 1: 0, 2: 17.5 };
-
-	private updatePinVisibility = () => {
-		const zoom = this.map?.getZoom() ?? 0;
-		for (const { marker, nivel } of this.markers) {
-			const minZoom = PucMap.NIVEL_MIN_ZOOM[nivel] ?? 0;
-			marker.getElement().style.display = zoom >= minZoom ? '' : 'none';
-		}
-	};
-
-	private fuse?: Fuse<GeoJSON.Feature<GeoJSON.Point, PinProps>>;
-
-	searchPins(query: string, limit = 10) {
-		if (!this.fuse || !query.trim()) return [];
-		return this.fuse.search(query, { limit }).map((r) => r.item);
-	}
+	private markers: maplibregl.Marker[] = [];
 
 	private async loadPins(url: string) {
 		const res = await fetch(url);
 		if (!res.ok) throw new Error(`pins: ${res.status} ${url}`);
 		const data = (await res.json()) as GeoJSON.FeatureCollection<GeoJSON.Point, PinProps>;
 
-		this.fuse = new Fuse(data.features, {
-			keys: [
-				{ name: 'properties.nome', weight: 3 },
-				{ name: 'properties.predio', weight: 2 },
-				{ name: 'properties.tipo', weight: 1 },
-				{ name: 'properties.descricao', weight: 1 },
-			],
-			threshold: 0.35,
-			ignoreDiacritics: true,
-			ignoreLocation: true,
-		});
-
 		for (const feature of data.features) {
 			if (feature.geometry?.type !== 'Point' || !this.map) continue;
 			const [lng, lat] = feature.geometry.coordinates;
-			const { nome, descricao, nivel = 1 } = feature.properties ?? ({} as PinProps);
+			const { nome, descricao } = feature.properties ?? ({} as PinProps);
 
 			const el = document.createElement('div');
 			el.className = 'pin';
@@ -293,23 +300,93 @@ export class PucMap extends LitElement {
 				content.append(desc);
 			}
 
-			this.markers.push({
-				nivel,
-				marker: new maplibregl.Marker({ element: el, anchor: 'bottom', offset: [0, 1] })
-					.setLngLat([lng, lat])
-					.setPopup(new maplibregl.Popup({ offset: 26, closeButton: false }).setDOMContent(content))
-					.addTo(this.map),
+			// Abre o painel lateral ao clicar no marcador.
+			el.addEventListener('click', () => {
+    			this.selectedPin = feature.properties;
+    			this.sidebarOpen = true;
 			});
-		}
 
-		this.map?.on('zoom', this.updatePinVisibility);
-		this.updatePinVisibility();
+			this.markers.push(
+				new maplibregl.Marker({ element: el, anchor: 'bottom', offset: [0, 1] })
+					.setLngLat([lng, lat])
+					.addTo(this.map),
+			);
+		}
 	}
 
+	private renderSidebar() {
+    return html`
+        <aside
+            class="sidebar ${this.sidebarOpen ? 'open' : ''}"
+            aria-hidden=${!this.sidebarOpen}
+        >
+            <button
+                class="sidebar-close"
+                type="button"
+                aria-label="Fechar painel"
+                @click=${() => {
+                    this.sidebarOpen = false;
+                }}
+            >×</button>
+			
+			
+            ${this.selectedPin ? html`
+			${this.selectedPin.imagem ? html`
+                    <img
+                        class="sidebar-image"
+                        src=${this.selectedPin.imagem}
+                      
+                    />
+                ` : ''}
+				
+                <h2>
+                    ${this.selectedPin.nome}
+				</h2>
+
+                <p class="sidebar-descricao">
+				<span class="sidebar-label">Descrição:</span>
+				<br>
+                    ${this.selectedPin.descricao}
+                </p>
+
+                <p class="sidebar-predio">
+                    <span class="sidebar-label">Prédio:</span>
+					<br>
+                    ${this.selectedPin.predio}
+                </p>
+
+                <p class="sidebar-tipo">
+                    <span class="sidebar-label">Tipo:</span>
+					<br>
+                    ${this.selectedPin.tipo}
+                </p>
+
+                <div class="sidebar-row">
+
+				<div class="sidebar-info">
+					<span class="sidebar-label">Andar</span>
+					<br>
+					${this.selectedPin.andar ?? 'Não informado'}
+				</div>
+
+				<div class="sidebar-info">
+					<span class="sidebar-label">Sala</span>
+					<br>
+					${this.selectedPin.nivel ?? 'Não informado'}
+				</div>
+
+			</div>
+                
+
+            ` : html`
+                <h2>Informações do prédio</h2>
+				
+            `}
+        </aside>
+    `;
+}
+
 	render() {
-		const names = this.searchQuery.length > 0
-			? ['Cardeal Leme']
-			: ['Cardeal Leme', 'Entrada do Cardeal Leme', 'Salas do Cardeal Leme'];
 		return html`
 			<div class="map-frame">
 				<div id="map" aria-label="Map of PUC-Rio"></div>
@@ -326,25 +403,10 @@ export class PucMap extends LitElement {
 					</button>
 					<input id="map-search" class="search-input" type="search"
 						placeholder="Pesquisar no mapa" aria-label="Pesquisar no mapa"
-						.value=${this.searchQuery}
-						@input=${(event: Event) => { this.searchQuery = (event.target as HTMLInputElement).value; }}
 						?disabled=${!this.searchOpen} />
 				</div>
-				${this.searchOpen ? html`
-					<ul class="search-results" aria-label="Sugestões de lugares" aria-live="polite">
-						${names.map(name => html`
-							<li>
-								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-									stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-									<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"></path>
-									<circle cx="12" cy="10" r="3"></circle>
-								</svg>
-								<span>${name}</span>
-							</li>
-						`)}
-					</ul>
-				` : ''}
 				<p class="location-status" role="status" aria-live="polite" aria-atomic="true">${this.locationStatus}</p>
+				${this.renderSidebar()}
 			</div>
 		`;
 	}
@@ -429,7 +491,7 @@ export class PucMap extends LitElement {
 	disconnectedCallback() {
 		this.ownerDocument.removeEventListener('pointerdown', this.handleOutsidePointer, true);
 		super.disconnectedCallback();
-		this.markers.forEach((m) => m.marker.remove());
+		this.markers.forEach((m) => m.remove());
 		this.markers = [];
 		this.map?.remove();
 		this.map = undefined;
